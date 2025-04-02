@@ -8,9 +8,23 @@
             Padding="30,0"
             Spacing="25">
             <Label
-                Text="Color Palette"
+                Text="ColorPalettes"
                 Style="{StaticResource Headline}"
                 SemanticProperties.HeadingLevel="Level1" />
+            
+            <Label x:Name="ErrorLabel"
+                   Text="{Binding ErrorMessage}"
+                   TextColor="Red"
+                   IsVisible="{Binding HasError}"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center" />
+            
+            <Button 
+                Text="Create a new palette"
+                VerticalOptions="Start"
+                HorizontalOptions="Start"
+                Width="200"/>
+            
             
             <CollectionView x:Name="ColorCollectionView">
                 <CollectionView.ItemsLayout>
@@ -20,14 +34,14 @@
                     <DataTemplate>
                         <Border Padding="10" 
                                 Margin="5"
-                                WidthRequest="60"
-                                HeightRequest="60"
+                                WidthRequest="120"
+                                HeightRequest="120"
                                 BackgroundColor="{Binding Color}">
                             <Label Text="{Binding Name}" 
                                    TextColor="White" 
                                    HorizontalOptions="Center" 
                                    VerticalOptions="Center" 
-                                   FontSize="Micro"
+                                   FontSize="15"
                                    MaximumWidthRequest="50"/>
                         </Border>
                     </DataTemplate>
