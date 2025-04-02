@@ -1,0 +1,35 @@
+# Compiled binary and object files
+bin/
+obj/
+
+# NuGet Packages
+/packages/
+
+# Rider project files
+riderModule.iml
+/_ReSharper.Caches/
+
+# macOS files
+.DS_Store
+
+# Containers directory
+.containers
+
+# IntelliJ IDEA project files
+.idea/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Logs
+*.log
+
+# Visual Studio Code
+.vscode/
+
+# Coverage
+coverage/
