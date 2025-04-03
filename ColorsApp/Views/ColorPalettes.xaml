@@ -21,10 +21,10 @@
             
             <Button 
                 Text="Create a new palette"
+                Command="{Binding CreatePaletteCommand}"
                 VerticalOptions="Start"
                 HorizontalOptions="Start"
                 Width="200"/>
-            
             
             <CollectionView x:Name="ColorCollectionView">
                 <CollectionView.ItemsLayout>

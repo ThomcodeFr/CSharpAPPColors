@@ -3,6 +3,8 @@ using System.ComponentModel;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using System.Windows.Input;
+using ColorsApp.Helper;
 using ColorsApp.Model;
 using ColorsApp.Services;
 
@@ -34,12 +36,18 @@ public class ColorPalettesVm : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
+    
+    public ICommand CreatePaletteCommand { get; }
 
     public ColorPalettesVm()
     {
         _apiService = new ColorApiService();
+        CreatePaletteCommand = new Command(async () => await CreateRandomPaletteAsync());
     }
-    
+
+    /// <summary>
+    /// Méthode récupérant le GET
+    /// </summary>
     public async Task LoadColorsFromApiAsync()
     {
         try
@@ -72,6 +80,45 @@ public class ColorPalettesVm : INotifyPropertyChanged
             ErrorMessage = "Erreur lors du chargement des couleurs";
             HasError = true;
             return;
+        }
+    }
+    
+    /// <summary>
+    /// Méthode utilisant le post
+    /// </summary>
+    private async Task CreateRandomPaletteAsync()
+    {
+        try
+        {
+            var random = new Random();
+            var newPalette = new PaletteDto
+            {
+                Colors = new List<ColorDto>
+                {
+                    new ColorDto
+                    {
+                        Type = ColorType.Primary, Red = random.Next(256), Green = random.Next(256),
+                        Blue = random.Next(256)
+                    },
+                }
+            };
+            var success = await _apiService.CreateColorPaletteAsync(newPalette);
+
+            if (success)
+            {
+                await LoadColorsFromApiAsync();
+                HasError = false;
+            }
+            else
+            {
+                ErrorMessage = "Erreur lors du chargement des couleurs";
+                HasError = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Erreur lors de la création : {ex.Message}";
+            HasError = true;
         }
     }
 

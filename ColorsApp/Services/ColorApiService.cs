@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using ColorsApp.Model;
 
@@ -13,6 +14,10 @@ public class ColorApiService
         _httpClient = new HttpClient();
     }
 
+    /// <summary>
+    /// GET : Requête get pour obtenir une palette.
+    /// </summary>
+    /// <returns></returns>
     public async Task<PalettesDto> GetColorsPaletteAsync()
     {
         try
@@ -30,5 +35,25 @@ public class ColorApiService
             return null;
         }
     }
-    
+
+    /// <summary>
+    /// POST : Requête post pour transmettre une couleur. 
+    /// </summary>
+    /// <param name="palette"></param>
+    /// <returns></returns>
+    public async Task<bool> CreateColorPaletteAsync(PaletteDto palette)
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(palette);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync(apiUrl, content);
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+    }
 }
