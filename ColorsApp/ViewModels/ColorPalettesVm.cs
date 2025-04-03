@@ -13,6 +13,7 @@ namespace ColorsApp.ViewModels;
 public class ColorPalettesVm : INotifyPropertyChanged
 {
     public ObservableCollection<ColorPaletteVm> ColorPalettes { get; set; } = new ObservableCollection<ColorPaletteVm>();
+    public ObservableCollection<ColorVm> AllColors { get; } = new ObservableCollection<ColorVm>();
     private readonly ColorApiService _apiService;
     private string _errorMessage;
     private bool _hasError;
@@ -53,33 +54,48 @@ public class ColorPalettesVm : INotifyPropertyChanged
         try
         {
             var palettesDto = await _apiService.GetColorsPaletteAsync();
-            if (palettesDto == null)
+            if (palettesDto == null || palettesDto.Items == null || !palettesDto.Items.Any())
             {
-                ErrorMessage = "Aucune donnée récupérée de l'API.";
-                HasError = true;
+                await MainThread.InvokeOnMainThreadAsync(() =>
+                {
+                    ErrorMessage = "Aucune donnée récupérée de l'API.";
+                    HasError = true;
+                    AllColors.Clear();
+                });
                 return;
             }
-            
-            ColorPalettes.Clear();
-            foreach (var paletteDto in palettesDto.Items)
+
+            await MainThread.InvokeOnMainThreadAsync(() =>
             {
-                var paletteVm = new ColorPaletteVm();
-                foreach (var colorDto in paletteDto.Colors)
+                HasError = false;
+                ColorPalettes.Clear();
+                AllColors.Clear();
+                foreach (var paletteDto in palettesDto.Items)
                 {
-                    paletteVm.Colors.Add(new ColorVm
+                    var paletteVm = new ColorPaletteVm();
+                    foreach (var colorDto in paletteDto.Colors)
                     {
-                        ColorType = colorDto.Type,
-                        Color = Color.FromRgb(colorDto.Red, colorDto.Green, colorDto.Blue)
-                    });
+                        var colorVm = new ColorVm
+                        {
+                            ColorType = colorDto.Type,
+                            Color = Color.FromRgb(colorDto.Red, colorDto.Green, colorDto.Blue)
+                        };
+                        paletteVm.Colors.Add(colorVm);
+                        AllColors.Add(colorVm);
+                    }
+
+                    ColorPalettes.Add(paletteVm);
                 }
-                ColorPalettes.Add(paletteVm);
-            }
+            });
         }
         catch (Exception ex)
         {
-            ErrorMessage = "Erreur lors du chargement des couleurs";
-            HasError = true;
-            return;
+            await MainThread.InvokeOnMainThreadAsync(() =>
+            {
+                ErrorMessage = "Erreur lors du chargement des couleurs";
+                HasError = true;
+                AllColors.Clear();
+            }); 
         }
     }
     
@@ -127,13 +143,5 @@ public class ColorPalettesVm : INotifyPropertyChanged
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
-    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
-    {
-        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-        field = value;
-        OnPropertyChanged(propertyName);
-        return true;
     }
 }

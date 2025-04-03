@@ -18,9 +18,6 @@ public partial class ColorPalettes : ContentPage
     private async void LoadDataAsync()
     {
         await _viewModel.LoadColorsFromApiAsync();
-        if (_viewModel.ColorPalettes.Count > 0)
-        {
-            ColorCollectionView.ItemsSource = _viewModel.ColorPalettes[0].Colors;
-        }
+        
     }
 }
